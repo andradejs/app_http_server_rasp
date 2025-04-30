@@ -8,7 +8,7 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const port = 3002;
+const port = 3000;
 
 // Variáveis globais para armazenar os últimos dados recebidos
 let ultimoButton = null;
@@ -78,5 +78,5 @@ app.get('/', (req, res) => {
 
 // Inicia o servidor
 server.listen(port, '0.0.0.0', () => {
-    console.log(`Servidor rodando em http://192.168.1.15:${port}`);
+    console.log(`Servidor esta rodando em http://localhost:3000`);
 });
