@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Rosa dos Ventos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: inline-block;
+        }
+        h1 {
+            color: #333;
+        }
+        .compass {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 20px auto;
+            border: 2px solid #333;
+            border-radius: 50%;
+            background: radial-gradient(circle, #eaeaea 90%, #ccc 100%);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+        }
+        .compass .direction {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #333;
+            background: white;
+            border: 1px solid #aaa;
+            border-radius: 50%;
+            transition: background 0.3s, color 0.3s;
+        }
+        .compass .direction.active {
+            background: #f00;
+            color: white;
+        }
+        .norte { top: -10%; left: 50%; transform: translate(-50%, 0); }
+        .nordeste { top: 15%; left: 85%; transform: translate(-50%, -50%); }
+        .leste { top: 50%; left: 110%; transform: translate(-100%, -50%); }
+        .sudeste { top: 85%; left: 85%; transform: translate(-50%, -50%); }
+        .sul { top: 110%; left: 50%; transform: translate(-50%, -100%); }
+        .sudoeste { top: 85%; left: 15%; transform: translate(-50%, -50%); }
+        .oeste { top: 50%; left: -10%; transform: translate(0, -50%); }
+        .noroeste { top: 15%; left: 15%; transform: translate(-50%, -50%); }
+        .centro {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            background: #333;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        .compass-label {
+            position: absolute;
+            font-size: 12px;
+            color: #333;
+        }
+    </style>
+    <script>
+        const updateCompass = (position) => {
+            // Remove a classe 'active' de todas as direções
+            document.querySelectorAll('.compass .direction').forEach(el => el.classList.remove('active'));
+
+            // Adiciona a classe 'active' na direção correspondente
+            const element = document.querySelector(`.compass .${position.toLowerCase()}`);
+            if (element) {
+                element.classList.add('active');
+            }
+        };
+
+        const socket = new WebSocket("ws://" + window.location.host);
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            document.getElementById("buttonStatus").textContent = data.button ?? 'Nenhum dado ainda';
+            document.getElementById("sensorTemp").textContent = data.sensor + " °C" ?? 'Nenhum dado ainda';
+            document.getElementById("valueX").textContent = data.x ?? 'Nenhum dado ainda';
+            document.getElementById("valueY").textContent = data.y ?? 'Nenhum dado ainda';
+            document.getElementById("joystickPosition").textContent = data.position ?? 'Centro';
+
+            // Atualiza a rosa dos ventos
+            updateCompass(data.position ?? 'centro');
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Últimos Dados Recebidos</h1>
+        <p><strong>Status do botão:</strong> <span id="buttonStatus">Nenhum dado ainda</span></p>
+        <p><strong>Temperatura do sensor:</strong> <span id="sensorTemp">Nenhum dado ainda</span></p>
+        <p><strong>Joystick X:</strong> <span id="valueX">Nenhum dado ainda</span></p>
+        <p><strong>Joystick Y:</strong> <span id="valueY">Nenhum dado ainda</span></p>
+        <p><strong>Posição do Joystick:</strong> <span id="joystickPosition">Centro</span></p>
+
+        <div class="compass">
+            <div class="direction norte">N</div>
+            <div class="direction nordeste">NE</div>
+            <div class="direction leste">E</div>
+            <div class="direction sudeste">SE</div>
+            <div class="direction sul">S</div>
+            <div class="direction sudoeste">SO</div>
+            <div class="direction oeste">O</div>
+            <div class="direction noroeste">NO</div>
+            <div class="centro"></div>
+        </div>
+    </div>
+</body>
+</html>
