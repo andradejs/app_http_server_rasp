@@ -73,7 +73,7 @@ app.get('/status', (req, res) => {
 // Rota para visualizar os últimos dados recebidos
 app.get('/', (req, res) => {
     
-    res.sendFile(path.join(__dirname, "templates", "index.html"));
+    res.sendFile(path.join(__dirname, "index.html"));
 });
 
 // Inicia o servidor
