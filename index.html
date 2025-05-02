@@ -85,17 +85,30 @@
             }
         };
 
-        const socket = new WebSocket("ws://" + window.location.host);
-        socket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            document.getElementById("buttonStatus").textContent = data.button ?? 'Nenhum dado ainda';
-            document.getElementById("sensorTemp").textContent = data.sensor + " °C" ?? 'Nenhum dado ainda';
-            document.getElementById("valueX").textContent = data.x ?? 'Nenhum dado ainda';
-            document.getElementById("valueY").textContent = data.y ?? 'Nenhum dado ainda';
-            document.getElementById("joystickPosition").textContent = data.position ?? 'Centro';
+        const pollForUpdates = async () => {
+            try {
+                const response = await fetch('/poll');
+                const data = await response.json();
+                document.getElementById("buttonStatus").textContent = data.button ?? 'Nenhum dado ainda';
+                document.getElementById("sensorTemp").textContent = data.sensor + " °C" ?? 'Nenhum dado ainda';
+                document.getElementById("valueX").textContent = data.x ?? 'Nenhum dado ainda';
+                document.getElementById("valueY").textContent = data.y ?? 'Nenhum dado ainda';
+                document.getElementById("joystickPosition").textContent = data.position ?? 'Centro';
 
-            // Atualiza a rosa dos ventos
-            updateCompass(data.position ?? 'centro');
+                // Atualiza a rosa dos ventos
+                updateCompass(data.position ?? 'centro');
+
+                // Continue polling
+                pollForUpdates();
+            } catch (error) {
+                console.error('Erro ao buscar atualizações:', error);
+                setTimeout(pollForUpdates, 1000); // Tenta novamente após 1 segundo
+            }
+        };
+
+        // Inicia o polling ao carregar a página
+        window.onload = () => {
+            pollForUpdates();
         };
     </script>
 </head>
